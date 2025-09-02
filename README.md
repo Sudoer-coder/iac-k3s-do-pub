@@ -170,3 +170,5 @@ For learning or edge workloads, K3s on Droplet is lightweight and cheaper.
 
 This repo demonstrates Infra as Code + CI/CD best practices with Terraform Cloud approval workflow.
 
+
+<p align="center"> Made with ❤️ by <a href="https://github.com/<your-username>">Your Name</a> </p> ```
