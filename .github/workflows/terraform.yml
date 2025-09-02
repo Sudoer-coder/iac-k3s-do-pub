@@ -1,0 +1,77 @@
+name: Terraform CI/CD
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+  TFC_TOKEN: ${{ secrets.MY_TFT }}  # Terraform Cloud token for backend authentication
+
+jobs:
+  plan:
+    name: Validate & Plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+          cli_config_credentials_token: ${{ secrets.MY_TFT }}  # Pass token to Terraform CLI
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan 
+
+      - name: Show Plan (text)
+        run: terraform show 
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: |
+            tfplan
+            plan.txt
+
+  apply:
+    name: Apply to Prod
+    runs-on: ubuntu-latest
+    needs: [ plan ]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    environment:
+      name: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+          cli_config_credentials_token: ${{ secrets.MY_TFT }}  # Pass token to Terraform CLI
+
+      - name: Terraform Init
+        run: terraform init 
+
+      - name: Terraform Plan (fresh)
+        run: terraform plan 
+
+      - name: Terraform Apply
+        run: terraform apply 
