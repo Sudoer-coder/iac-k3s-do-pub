@@ -1,4 +1,4 @@
-<h1 align="center">🚀 K3s on DigitalOcean with Terraform + GitHub Actions + Terraform Cloud</h1>
+<h2 align="center">🚀 K3s on DigitalOcean with Terraform + GitHub Actions + Terraform Cloud</h2>
 <!-- Project Banner -->
 <p align="center">
   <img src="docu/K3s IAC.png" alt="K3s on DigitalOcean with Terraform" width="800"/>
@@ -24,23 +24,51 @@
 
 ## 📂 Repository Structure
 
-o-k8s/
-├── main.tf # Terraform resources (Droplet, cloud-init for K3s, firewall, project)
-├── variables.tf # Input variables
-├── outputs.tf # Outputs (Droplet IP, kubeconfig)
-├── provider.tf # DigitalOcean provider configuration
-├── versions.tf # Terraform version requirements
-├── backend.tf # Terraform Cloud remote backend configuration
+IAC-K3S-DO/
+├── main.tf            # Terraform resources (Droplet, cloud-init for K3s, firewall, project)
+├── variables.tf       # Input variables
+├── outputs.tf         # Outputs (Droplet IP, kubeconfig)
+├── provider.tf        # DigitalOcean provider configuration
+├── versions.tf        # Terraform version requirements
+├── backend.tf         # Terraform Cloud remote backend configuration
 ├── env/
-│ └── terraform.tfvars # Local environment variables (DO token, SSH key name, admin CIDRs)
+│   └── terraform.tfvars   # Local environment variables (DO token, SSH key, admin CIDRs)
 ├── .gitignore
 └── .github/
-└── workflows/
-└── terraform.yml # GitHub Actions workflow for CI/CD
+    └── workflows/
+        └── terraform.yml  # GitHub Actions workflow (validate + plan)
 
 
 ---
 
+## 🌈 Workflow Diagram
+
+       🖥️ VSCode
+           │
+           ▼
+      ✏️ Edit .tf files
+           │
+           ▼
+       🐙 GitHub
+           │
+           ▼
+   ⚙️ GitHub Actions CI
+     (fmt → validate → plan)
+           │
+           ▼
+      ☁️ Terraform Cloud
+     (Remote state + Manual Apply)
+           │
+           ▼
+      🟢 DigitalOcean
+  (Droplet + Firewall + K3s)
+           │
+           ▼
+       🎉 K3s Cluster Ready
+
+🔔 Note: Manual approval in Terraform Cloud ensures safe deployment for production.
+
+---
 ## ⚙️ Workflow Overview
 
 1. **Local Development**  
@@ -86,8 +114,8 @@ o-k8s/
 ### 1. Clone Repo
 
 ```bash
-git clone https://github.com/<your-username>/do-k8s.git
-cd do-k8s
+git clone https://github.com/Sudoer-coder/iac-k3s-do-pub.git
+cd IAC-K3S-DO
 
 2. Configure Environment Variables
 
